@@ -52,7 +52,7 @@ const employeeStore = {
         const updatedEmployee = {
           ...employees[index],
           ...employeeData,
-          id: parseInt(id), 
+          id: parseInt(id),
           updatedAt: new Date(),
         };
 
@@ -65,14 +65,14 @@ const employeeStore = {
   delete: async (id) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        const initialLength = employees.length;
-        employees = employees.filter((emp) => emp.id !== parseInt(id));
+        const index = employees.findIndex((emp) => emp.id === parseInt(id));
 
-        if (employees.length === initialLength) {
+        if (index === -1) {
           reject(new Error("Employee not found"));
           return;
         }
 
+        employees.splice(index, 1);
         resolve(true);
       }, 100);
     });
