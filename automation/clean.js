@@ -1,14 +1,15 @@
+require("dotenv").config({ path: "../.env" }); 
 const fs = require('fs');
 const path = require('path');
 
-const DIR="C:\\faisal\\huawei-tech-test\\automation\\cron"
+const dir = process.env.CORN_DIR
 
 function cleanOldFiles() {
-  const files = fs.readdirSync(DIR);
+  const files = fs.readdirSync(dir);
   const now = Date.now();
 
   files.forEach(file => {
-    const filepath = path.join(DIR, file);
+    const filepath = path.join(dir, file);
     const stats = fs.statSync(filepath);
 
     const age = now - stats.mtimeMs;

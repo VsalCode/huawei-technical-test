@@ -1,7 +1,8 @@
+require("dotenv").config({ path: "../.env" }); 
 const fs = require('fs');
 const path = require('path');
 
-DIR="C:\\faisal\\huawei-tech-test\\automation\\cron"
+const dir = process.env.CORN_DIR
 
 function collectData() {
   // contoh data dummy, bisa diganti dengan fetch API atau database query
@@ -20,7 +21,7 @@ function saveData() {
   const hours = `${String(now.getHours()).padStart(2, '0')}.${String(now.getMinutes()).padStart(2, '0')}`;
 
   const filename = `cron_${date}_${hours}.csv`;
-  const filepath = path.join(DIR, filename);
+  const filepath = path.join(dir, filename);
 
   const data = collectData().map(row => row.join(",")).join("\n");
 
