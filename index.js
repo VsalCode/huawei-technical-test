@@ -1,10 +1,10 @@
 const express = require("express");
-const routers = require("./src/routers")
+const routers = require("./src/routers/index.router");
 
 const app = express();
 
 app.use(express.json());
-app.use("/", routers)
+app.use("/", routers);
 
 app.get("/", (req, res) => {
   res.send("Express server is running!");
