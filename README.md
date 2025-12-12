@@ -44,7 +44,7 @@ huawei-tech-test/
 - Format file: `cron_{MMDDYYYY}_{HH.MM}.csv`
 - Penyimpanan di path `/home/cron` (dikonfigurasi via environment variable)
 
-### Data Processing
+## Data Processing
 - SQL scripts untuk setup database dan query manipulasi data
 - Query untuk insert, update, select dengan kondisi tertentu
 
@@ -62,13 +62,13 @@ npm install
 ```
 
 3. Setup environment variables:
-Buat file `.env` di root directory:
+Buat file `.env` di root directory (atau copy dari `.env.example`):
 ```
 PORT=3000
-CORN_DIR=/home/cron
+CORN_DIR=C:\faisal\huawei-tech-test\automation\cron
 ```
 
-4. Pastikan directory `/home/cron` ada dan writable.
+4. Pastikan directory `automation/cron` ada dan writable (sudah tersedia).
 
 ## Penggunaan
 
@@ -84,17 +84,17 @@ Akses Swagger UI di: `http://localhost:3000/api-docs`
 
 ### Menjalankan Automation Scripts
 
-#### Manual Collect Data
+Manual Collect Data
 ```bash
 node automation/collect.js
 ```
 
-#### Manual Clean Files
+Manual Clean Files
 ```bash
 node automation/clean.js
 ```
 
-#### Menjalankan Scheduler
+Menjalankan Scheduler
 ```bash
 node automation/scheduler.js
 ```
@@ -105,32 +105,13 @@ Scheduler akan menjalankan:
 
 ## API Endpoints
 
-### Employees
-
-#### GET /employees
-Mengambil semua employees
-- Response: Array of employee objects
-
-#### GET /employees/:id
-Mengambil employee berdasarkan ID
-- Parameters: id (integer)
-- Response: Employee object atau 404 jika tidak ditemukan
-
-#### POST /employees
-Membuat employee baru
-- Body: Employee data (name, position, joinDate, releaseDate, yearOfExperience, salary)
-- Response: Created employee object
-
-#### PUT /employees/:id
-Update employee berdasarkan ID
-- Parameters: id (integer)
-- Body: Updated employee data
-- Response: Updated employee object
-
-#### DELETE /employees/:id
-Menghapus employee berdasarkan ID
-- Parameters: id (integer)
-- Response: Success message
+| Method | Endpoint | Description | Parameters/Body | Response |
+|--------|----------|-------------|-----------------|----------|
+| GET | /employees | Mengambil semua employees | - | Array of employee objects |
+| GET | /employees/:id | Mengambil employee berdasarkan ID | id (integer) | Employee object atau 404 jika tidak ditemukan |
+| POST | /employees | Membuat employee baru | Body: Employee data (name, position, joinDate, releaseDate, yearOfExperience, salary) | Created employee object |
+| PUT | /employees/:id | Update employee berdasarkan ID | id (integer), Body: Updated employee data | Updated employee object |
+| DELETE | /employees/:id | Menghapus employee berdasarkan ID | id (integer) | Success message |
 
 ## Dependencies
 
@@ -142,16 +123,64 @@ Menghapus employee berdasarkan ID
 
 ## Data Processing
 
-### Setup Database
-Jalankan `data-processing/create-table.sql` untuk membuat tabel employees dan seed data.
+Step to run SQL use docker image (postgresql) :
+#### 1. Pull PostgreSQL image
+```bash
+docker pull postgres:17
+```
+#### 2. Run Container PostgreSQL
+```bash
+docker run -d \
+  --name pg-huawei \
+  -e POSTGRES_PASSWORD=admin123 \
+  -p 5432:5432 \
+  postgres:17
+```
+#### 3. Copy SQL Files ke Dalam Container
+```bash
+docker cp data-processing/create-table.sql pg-huawei:/create-table.sql
+docker cp data-processing/task.sql pg-huawei:/task.sql
+```
+#### 4. Masuk ke PostgreSQL Client di Dalam Container
+```bash
+docker exec -it pg-huawei bash
+```
+#### 5. Connect ke PostgreSQL Database
+```bash
+psql -U postgres
+```
+#### 6. Buat Database dan Jalankan SQL Scripts
+```sql
+-- Buat database baru (opsional, atau gunakan default postgres)
+CREATE DATABASE huawei_test;
+\c huawei_test;
 
-### Query Tasks
-File `data-processing/task.sql` berisi query untuk:
+-- Jalankan create-table.sql
+\i /create-table.sql
+
+-- Jalankan task.sql
+\i /task.sql
+```
+
+- File `data-processing/create-table.sql` untuk membuat table "employees" dan seed data,
+- File `data-processing/task.sql` berisi query untuk:
 1. Insert data baru (Albert)
 2. Update salary untuk Engineer
 3. Hitung total salary tahun 2021
 4. Top 3 karyawan dengan experience terbanyak
 5. Subquery untuk Engineer dengan experience <= 3 tahun
+#### 7. Verifikasi Data
+```sql
+-- Lihat tabel employees
+SELECT * FROM employees;
+
+-- Keluar dari psql
+\q
+```
+#### 8. Keluar dari Container
+```bash
+exit
+```
 
 ## Testing
 
